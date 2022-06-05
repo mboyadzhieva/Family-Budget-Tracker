@@ -12,7 +12,7 @@
                 .UseSwagger()
                 .UseSwaggerUI(options =>
                 {
-                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Rent A Car API");
+                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Family Budget Tracker API");
                     options.RoutePrefix = string.Empty;
                 });
 

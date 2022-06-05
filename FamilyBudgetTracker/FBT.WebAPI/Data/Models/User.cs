@@ -8,10 +8,5 @@
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
-
-        public IEnumerable<Expense> Expenses { get; } = new HashSet<Expense>();
-
-        public IEnumerable<Income> Incomes { get; } = new HashSet<Income>();
-
     }
 }

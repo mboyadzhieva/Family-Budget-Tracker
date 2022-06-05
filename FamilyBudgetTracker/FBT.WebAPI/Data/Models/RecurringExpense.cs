@@ -2,8 +2,10 @@
 {
     using Base;
 
-    public class Expense : OneTimePayment
+    public class RecurringExpense : RecurringPayment
     {
+        public decimal TotalAmount { get; set; }
+
         public ExpenseType ExpenseType { get; set; }
     }
 }

@@ -2,8 +2,10 @@
 {
     using Base;
 
-    public class Income : OneTimePayment
+    public class RecurringIncome : RecurringPayment
     {
+        public decimal TotalAmount { get; set; }
+
         public IncomeType IncomeType { get; set; }
     }
 }

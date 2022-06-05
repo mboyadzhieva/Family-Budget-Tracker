@@ -6,6 +6,7 @@
     [Route("[controller]")]
     public class HomeController : ControllerBase
     {
+        [HttpGet]
         public IActionResult Get()
         {
             return Ok("Works");

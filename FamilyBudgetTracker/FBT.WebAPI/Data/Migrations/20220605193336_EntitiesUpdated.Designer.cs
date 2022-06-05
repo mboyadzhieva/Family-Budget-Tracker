@@ -4,14 +4,16 @@ using FBT.WebAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FBT.WebAPI.Data.Migrations
 {
     [DbContext(typeof(FamilyBudgetTrackerDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220605193336_EntitiesUpdated")]
+    partial class EntitiesUpdated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,6 +33,10 @@ namespace FBT.WebAPI.Data.Migrations
 
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ExpenseType")
                         .HasColumnType("int");
@@ -53,6 +59,8 @@ namespace FBT.WebAPI.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Expenses");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Expense");
                 });
 
             modelBuilder.Entity("FBT.WebAPI.Data.Models.Income", b =>
@@ -67,6 +75,10 @@ namespace FBT.WebAPI.Data.Migrations
 
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("IncomeType")
                         .HasColumnType("int");
@@ -89,84 +101,8 @@ namespace FBT.WebAPI.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Incomes");
-                });
 
-            modelBuilder.Entity("FBT.WebAPI.Data.Models.RecurringExpense", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ExpenseType")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RecurringExpenses");
-                });
-
-            modelBuilder.Entity("FBT.WebAPI.Data.Models.RecurringIncome", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("IncomeType")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RecurringIncomes");
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Income");
                 });
 
             modelBuilder.Entity("FBT.WebAPI.Data.Models.User", b =>
@@ -371,6 +307,26 @@ namespace FBT.WebAPI.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("FBT.WebAPI.Data.Models.RecurringExpense", b =>
+                {
+                    b.HasBaseType("FBT.WebAPI.Data.Models.Expense");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasDiscriminator().HasValue("RecurringExpense");
+                });
+
+            modelBuilder.Entity("FBT.WebAPI.Data.Models.RecurringIncome", b =>
+                {
+                    b.HasBaseType("FBT.WebAPI.Data.Models.Income");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasDiscriminator().HasValue("RecurringIncome");
+                });
+
             modelBuilder.Entity("FBT.WebAPI.Data.Models.Expense", b =>
                 {
                     b.HasOne("FBT.WebAPI.Data.Models.User", "User")
@@ -383,28 +339,6 @@ namespace FBT.WebAPI.Data.Migrations
                 });
 
             modelBuilder.Entity("FBT.WebAPI.Data.Models.Income", b =>
-                {
-                    b.HasOne("FBT.WebAPI.Data.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("FBT.WebAPI.Data.Models.RecurringExpense", b =>
-                {
-                    b.HasOne("FBT.WebAPI.Data.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("FBT.WebAPI.Data.Models.RecurringIncome", b =>
                 {
                     b.HasOne("FBT.WebAPI.Data.Models.User", "User")
                         .WithMany()

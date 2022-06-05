@@ -3,7 +3,11 @@
     using AutoMapper;
     using FBT.WebAPI.Data;
     using FBT.WebAPI.Data.Models;
+    using FBT.WebAPI.Features.Expenses;
     using FBT.WebAPI.Features.Identity;
+    using FBT.WebAPI.Features.Incomes;
+    using FBT.WebAPI.Features.RecurringExpenses;
+    using FBT.WebAPI.Features.RecurringIncomes;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
@@ -79,7 +83,11 @@
             this IServiceCollection services)
         {
             services
-               .AddTransient<IIdentityService, IdentityService>();
+               .AddTransient<IIdentityService, IdentityService>()
+               .AddTransient<IExpenseService, ExpenseService>()
+               .AddTransient<IIncomeService, IncomeService>()
+               .AddTransient<IRecurringExpenseService, RecurringExpenseService>()
+               .AddTransient<IRecurringIncomeService, RecurringIncomeService>();
 
             return services;
         }

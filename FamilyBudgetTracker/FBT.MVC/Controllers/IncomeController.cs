@@ -13,7 +13,7 @@ namespace FBT.MVC.Controllers
     public class IncomeController : Controller
     {
         private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly string apiUrl = "https://familybudgettrackerwebapi.azurewebsites.net/incomes";
+        private readonly string apiUrl = "https://familybudgettrackerwebapi.azurewebsites.net";
         private const string JSON_MEDIA_TYPE = "application/json";
 
         public IncomeController(IHttpContextAccessor httpContextAccessor)
@@ -40,14 +40,26 @@ namespace FBT.MVC.Controllers
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenValue);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JSON_MEDIA_TYPE));
 
-                var response = await client.GetAsync(apiUrl);
+                var incomesPostRequestResponse = await client.GetAsync($"{apiUrl}/incomes");
+                var recurringIncomesPostRequestResponse = await client.GetAsync($"{apiUrl}/recurringIncomes");
 
-                if (response.IsSuccessStatusCode && token != null)
+                if (incomesPostRequestResponse.IsSuccessStatusCode
+                    && recurringIncomesPostRequestResponse.IsSuccessStatusCode)
                 {
-                    //storing the response details received from the web api
-                    var incomesResponse = response.Content.ReadAsStringAsync().Result;
-                    //deserializing the response and storing it into the list
-                    incomes = JsonConvert.DeserializeObject<List<IncomeModel>>(incomesResponse);
+                    var incomesResult = incomesPostRequestResponse.Content.ReadAsStringAsync().Result;
+                    var recurringIncomesResult = recurringIncomesPostRequestResponse.Content.ReadAsStringAsync().Result;
+
+                    JsonConvert.DeserializeObject<List<IncomeModel>>(incomesResult).ForEach(i =>
+                    {
+                        i.IsRecurring = false;
+                        incomes.Add(i);
+                    });
+
+                    JsonConvert.DeserializeObject<List<IncomeModel>>(recurringIncomesResult).ForEach(ri =>
+                    {
+                        ri.IsRecurring = true;
+                        incomes.Add(ri);
+                    });
                 }
             }
             return View(incomes);
@@ -77,7 +89,17 @@ namespace FBT.MVC.Controllers
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenValue);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JSON_MEDIA_TYPE));
 
-                var response = await client.PostAsJsonAsync(apiUrl, model);
+
+                HttpResponseMessage response = new HttpResponseMessage();
+
+                if (model.IsRecurring)
+                {
+                    response = await client.PostAsJsonAsync($"{apiUrl}/recurringIncomes", model);
+                }
+                else
+                {
+                    response = await client.PostAsJsonAsync($"{apiUrl}/incomes", model);
+                }
 
                 if (response.IsSuccessStatusCode)
                 {

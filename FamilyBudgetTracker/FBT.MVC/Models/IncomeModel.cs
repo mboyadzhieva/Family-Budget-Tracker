@@ -18,5 +18,7 @@
         [DisplayFormat(ApplyFormatInEditMode = true)]
         [Display(Name = "Payment Date")]
         public DateTime PaymentDate { get; set; }
+
+        public bool IsRecurring { get; set; }
     }
 }

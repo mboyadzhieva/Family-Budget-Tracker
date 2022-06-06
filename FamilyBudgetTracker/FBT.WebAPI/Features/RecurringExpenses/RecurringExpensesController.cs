@@ -17,9 +17,16 @@
         }
 
         [HttpGet]
-        public async Task<IEnumerable<ExpenseResponseModel>> GetAll()
+        public async Task<IEnumerable<ExpenseModel>> GetAll()
         {
             return await recurringExpense.GetAll();
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<ExpenseModel> Get(int id)
+        {
+            return await recurringExpense.Get(id);
         }
 
         [HttpPost]
@@ -31,7 +38,7 @@
         }
 
         [HttpPut]
-        public async Task<ActionResult> Update(UpdateExpenseModel model)
+        public async Task<ActionResult> Update(ExpenseModel model)
         {
             var updated = await this.recurringExpense.Update(model);
 

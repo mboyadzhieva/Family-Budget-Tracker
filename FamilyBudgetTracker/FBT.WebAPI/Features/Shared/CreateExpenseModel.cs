@@ -12,5 +12,7 @@
         public DateTime PaymentDate { get; set; }
 
         public string ExpenseType { get; set; }
+
+        public bool IsRecurring { get; set; }
     }
 }

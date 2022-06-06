@@ -6,10 +6,12 @@
 
     public interface IExpenseService
     {
-        Task<IEnumerable<ExpenseResponseModel>> GetAll();
+        Task<IEnumerable<ExpenseModel>> GetAll();
+
+        Task<ExpenseModel> Get(int id);
 
         Task<int> Create(CreateExpenseModel model);
 
-        Task<bool> Update(UpdateExpenseModel model);
+        Task<bool> Update(ExpenseModel model);
     }
 }

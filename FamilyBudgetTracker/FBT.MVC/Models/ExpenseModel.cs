@@ -19,5 +19,7 @@ namespace FBT.MVC.Models
         [DisplayFormat(ApplyFormatInEditMode = true)]
         [DisplayName("Payment Date")]
         public DateTime PaymentDate { get; set; }
+
+        public bool IsRecurring { get; set; }
     }
 }

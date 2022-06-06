@@ -25,7 +25,7 @@
             this.dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<ExpenseResponseModel>> GetAll()
+        public async Task<IEnumerable<ExpenseModel>> GetAll()
         {
             var userId = user
                 .Claims
@@ -35,8 +35,15 @@
             return await this.dbContext
                 .RecurringExpenses
                 .Where(re => re.UserId == userId)
-                .Select(re => mapper.Map<ExpenseResponseModel>(re))
+                .Select(re => mapper.Map<ExpenseModel>(re))
                 .ToListAsync();
+        }
+
+        public async Task<ExpenseModel> Get(int id)
+        {
+            var expense = await this.dbContext.RecurringExpenses.FindAsync(id);
+
+            return mapper.Map<ExpenseModel>(expense);
         }
 
         public async Task<int> Create(CreateExpenseModel model)
@@ -56,7 +63,7 @@
             return recurringExpense.Id;
         }
 
-        public async Task<bool> Update(UpdateExpenseModel model)
+        public async Task<bool> Update(ExpenseModel model)
         {
             var recurringExpense = await this.dbContext.RecurringExpenses.FindAsync(model.Id);
 

@@ -17,9 +17,16 @@
         }
 
         [HttpGet]
-        public async Task<IEnumerable<IncomeResponseModel>> GetAll()
+        public async Task<IEnumerable<IncomeModel>> GetAll()
         {
             return await income.GetAll();
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IncomeModel> Get(int id)
+        {
+            return await income.Get(id);
         }
 
         [HttpPost]
@@ -31,7 +38,7 @@
         }
 
         [HttpPut]
-        public async Task<ActionResult> Update(UpdateIncomeModel model)
+        public async Task<ActionResult> Update(IncomeModel model)
         {
             var updated = await this.income.Update(model);
 

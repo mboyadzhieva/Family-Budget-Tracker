@@ -17,9 +17,16 @@
         }
 
         [HttpGet]
-        public async Task<IEnumerable<IncomeResponseModel>> GetAll()
+        public async Task<IEnumerable<IncomeModel>> GetAll()
         {
             return await recurringIncome.GetAll();
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IncomeModel> Get(int id)
+        {
+            return await recurringIncome.Get(id);
         }
 
         [HttpPost]
@@ -30,9 +37,8 @@
             return Created(nameof(this.Create), id);
         }
 
-
         [HttpPut]
-        public async Task<ActionResult> Update(UpdateIncomeModel model)
+        public async Task<ActionResult> Update(IncomeModel model)
         {
             var updated = await this.recurringIncome.Update(model);
 

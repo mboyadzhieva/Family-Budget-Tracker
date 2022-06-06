@@ -11,6 +11,7 @@
         <td>Name</td>
         <td>Price</td>
         <td>Type</td>
+        <td>Recurring</td>
         <td>
             Actions
         </td>
@@ -21,6 +22,17 @@
             <td>@item.PaymentDate</td>
             <td>@item.Amount</td>
             <td>@item.IncomeType</td>
+            <td>@{
+                    if (@item.IsRecurring)
+                    {
+                        <span>Yes</span>
+                    }
+                    else
+                    {
+                        <span>No</span>
+                    }
+                }
+            </td>
             <td>
                 <a href="/Expense/Edit/@item.Id">Edit</a>
                 <a href="/Expense/Delete/@item.Id">Delete</a>

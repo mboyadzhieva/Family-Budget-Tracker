@@ -3,14 +3,19 @@
     using System;
     using System.ComponentModel.DataAnnotations;
 
-    public class ExpenseResponseModel
+    public class IncomeModel
     {
+        public int Id { get; set; }
+
         [Required]
         public decimal Amount { get; set; }
 
         [Required]
         public DateTime PaymentDate { get; set; }
 
-        public string ExpenseType { get; set; }
+        public string IncomeType { get; set; }
+
+        public bool IsRecurring { get; set; }
     }
 }
+

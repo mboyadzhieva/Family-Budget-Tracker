@@ -27,7 +27,7 @@
             this.dbContext
                 .Incomes
                 .Where(i => i.UserId == userId)
-                .Select(i => mapper.Map<IncomeResponseModel>(i))
+                .Select(i => mapper.Map<IncomeModel>(i))
                 .ToList()
                 .ForEach(i =>
                 {
@@ -37,7 +37,7 @@
             this.dbContext
                 .Expenses
                 .Where(e => e.UserId == userId)
-                .Select(e => mapper.Map<ExpenseResponseModel>(e))
+                .Select(e => mapper.Map<ExpenseModel>(e))
                 .ToList()
                 .ForEach(e =>
                 {

@@ -12,5 +12,7 @@
         public DateTime PaymentDate { get; set; }
 
         public string IncomeType { get; set; }
+
+        public bool IsRecurring { get; set; }
     }
 }

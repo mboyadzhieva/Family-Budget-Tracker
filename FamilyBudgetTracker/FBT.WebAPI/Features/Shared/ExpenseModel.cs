@@ -3,7 +3,7 @@
     using System;
     using System.ComponentModel.DataAnnotations;
 
-    public class UpdateIncomeModel
+    public class ExpenseModel
     {
         public int Id { get; set; }
 
@@ -13,6 +13,8 @@
         [Required]
         public DateTime PaymentDate { get; set; }
 
-        public string IncomeType { get; set; }
+        public string ExpenseType { get; set; }
+
+        public bool IsRecurring { get; set; }
     }
 }

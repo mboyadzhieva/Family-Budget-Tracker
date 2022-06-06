@@ -25,7 +25,7 @@
             this.dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<ExpenseResponseModel>> GetAll()
+        public async Task<IEnumerable<ExpenseModel>> GetAll()
         {
             var userId = user
                 .Claims
@@ -35,8 +35,15 @@
             return await this.dbContext
                 .Expenses
                 .Where(e => e.UserId == userId)
-                .Select(e => mapper.Map<ExpenseResponseModel>(e))
+                .Select(e => mapper.Map<ExpenseModel>(e))
                 .ToListAsync();
+        }
+
+        public async Task<ExpenseModel> Get(int id)
+        {
+            var expense = await this.dbContext.Expenses.FindAsync(id);
+
+            return mapper.Map<ExpenseModel>(expense);
         }
 
         public async Task<int> Create(CreateExpenseModel model)
@@ -48,14 +55,14 @@
 
             var expense = mapper.Map<Expense>(model);
             expense.UserId = userId;
-
             this.dbContext.Add(expense);
+
             await this.dbContext.SaveChangesAsync();
 
             return expense.Id;
         }
 
-        public async Task<bool> Update(UpdateExpenseModel model)
+        public async Task<bool> Update(ExpenseModel model)
         {
             var expense = await this.dbContext.Expenses.FindAsync(model.Id);
 
@@ -69,5 +76,6 @@
 
             return false;
         }
+
     }
 }

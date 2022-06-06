@@ -25,7 +25,7 @@
             this.dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<IncomeResponseModel>> GetAll()
+        public async Task<IEnumerable<IncomeModel>> GetAll()
         {
             var userId = user
                 .Claims
@@ -35,8 +35,15 @@
             return await this.dbContext
                 .RecurringIncomes
                 .Where(ri => ri.UserId == userId)
-                .Select(ri => mapper.Map<IncomeResponseModel>(ri))
+                .Select(ri => mapper.Map<IncomeModel>(ri))
                 .ToListAsync();
+        }
+
+        public async Task<IncomeModel> Get(int id)
+        {
+            var income = await this.dbContext.RecurringIncomes.FindAsync(id);
+
+            return mapper.Map<IncomeModel>(income);
         }
 
         public async Task<int> Create(CreateIncomeModel model)
@@ -56,7 +63,7 @@
             return recurringIncome.Id;
         }
 
-        public async Task<bool> Update(UpdateIncomeModel model)
+        public async Task<bool> Update(IncomeModel model)
         {
             var recurringIncome = await this.dbContext.RecurringIncomes.FindAsync(model.Id);
 

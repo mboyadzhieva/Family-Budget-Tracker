@@ -6,10 +6,12 @@
 
     public interface IRecurringIncomeService
     {
-        Task<IEnumerable<IncomeResponseModel>> GetAll();
+        Task<IEnumerable<IncomeModel>> GetAll();
+
+        Task<IncomeModel> Get(int id);
 
         Task<int> Create(CreateIncomeModel model);
 
-        Task<bool> Update(UpdateIncomeModel model);
+        Task<bool> Update(IncomeModel model);
     }
 }

@@ -13,7 +13,7 @@ namespace FBT.MVC.Controllers
     public class ExpenseController : Controller
     {
         private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly string apiUrl = "https://familybudgettrackerwebapi.azurewebsites.net/expenses";
+        private readonly string apiUrl = "https://familybudgettrackerwebapi.azurewebsites.net";
         private const string JSON_MEDIA_TYPE = "application/json";
 
         public ExpenseController(IHttpContextAccessor httpContextAccessor)
@@ -40,14 +40,26 @@ namespace FBT.MVC.Controllers
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenValue);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JSON_MEDIA_TYPE));
 
-                var response = await client.GetAsync(apiUrl);
+                var expensesPostRequestResponse = await client.GetAsync($"{apiUrl}/expenses");
+                var recurringExpensesPostRequestResponse = await client.GetAsync($"{apiUrl}/recurringExpenses");
 
-                if (response.IsSuccessStatusCode && token != null)
+                if (expensesPostRequestResponse.IsSuccessStatusCode 
+                    && recurringExpensesPostRequestResponse.IsSuccessStatusCode)
                 {
-                    //storing the response details received from the web api
-                    var expensesResponse = response.Content.ReadAsStringAsync().Result;
-                    //deserializing the response and storing it into the list
-                    expenses = JsonConvert.DeserializeObject<List<ExpenseModel>>(expensesResponse);
+                    var expensesResult = expensesPostRequestResponse.Content.ReadAsStringAsync().Result;
+                    var recurringExpensesResult = recurringExpensesPostRequestResponse.Content.ReadAsStringAsync().Result;
+
+                    JsonConvert.DeserializeObject<List<ExpenseModel>>(expensesResult).ForEach(e =>
+                    {
+                        e.IsRecurring = false;
+                        expenses.Add(e);
+                    });
+
+                    JsonConvert.DeserializeObject<List<ExpenseModel>>(recurringExpensesResult).ForEach(re =>
+                    {
+                        re.IsRecurring = true;
+                        expenses.Add(re);
+                    });
                 }
             }
             return View(expenses);
@@ -77,7 +89,92 @@ namespace FBT.MVC.Controllers
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenValue);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JSON_MEDIA_TYPE));
 
-                var response = await client.PostAsJsonAsync(apiUrl, model);
+                HttpResponseMessage response = new HttpResponseMessage();
+
+                if (model.IsRecurring)
+                {
+                    response = await client.PostAsJsonAsync($"{apiUrl}/recurringExpenses", model);
+                }
+                else
+                {
+                    response = await client.PostAsJsonAsync($"{apiUrl}/expenses", model);
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Index");
+                }
+            }
+
+            ModelState.AddModelError(string.Empty, "Server Error!");
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Edit(ExpenseModel model)
+        {
+            using (var client = new HttpClient())
+            {
+                var token = httpContextAccessor.HttpContext.Request.Cookies["token"];
+
+                if (token == null)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                string tokenValue = token.ToString();
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenValue);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JSON_MEDIA_TYPE));
+
+                HttpResponseMessage response = new HttpResponseMessage();
+
+                if (model.IsRecurring)
+                {
+                    response = await client.PostAsJsonAsync($"{apiUrl}/recurringExpenses", model.Id);
+                }
+                else
+                {
+                    response = await client.PostAsJsonAsync($"{apiUrl}/expenses", model.Id);
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Index");
+                }
+            }
+
+            ModelState.AddModelError(string.Empty, "Server Error!");
+            return View("~/Views/Expense/Create.cshtml", model);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Edit(ExpenseModel model)
+        {
+            using (var client = new HttpClient())
+            {
+                var token = httpContextAccessor.HttpContext.Request.Cookies["token"];
+
+                if (token == null)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                string tokenValue = token.ToString();
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenValue);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JSON_MEDIA_TYPE));
+
+                HttpResponseMessage response = new HttpResponseMessage();
+
+                if (model.IsRecurring)
+                {
+                    response = await client.PostAsJsonAsync($"{apiUrl}/recurringExpenses", model);
+                }
+                else
+                {
+                    response = await client.PostAsJsonAsync($"{apiUrl}/expenses", model);
+                }
 
                 if (response.IsSuccessStatusCode)
                 {

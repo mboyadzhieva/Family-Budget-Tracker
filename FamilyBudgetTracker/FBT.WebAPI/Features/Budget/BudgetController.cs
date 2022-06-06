@@ -20,14 +20,19 @@
         }
 
         [HttpGet]
-        public ActionResult<decimal> Calculate()
+        public ActionResult<BudgetResponseModel> Calculate()
         {
             var userId = user
                 .Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)
                 ?.Value;
 
-            return budget.Calculate(userId);
+            var currentBudget = budget.Calculate(userId);
+
+            return new BudgetResponseModel
+            {
+                CurrentBudget = currentBudget
+            };
         }
     }
 }

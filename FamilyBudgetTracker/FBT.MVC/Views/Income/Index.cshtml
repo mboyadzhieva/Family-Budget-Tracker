@@ -1,0 +1,30 @@
+﻿@using System.Linq;
+@model List<FBT.MVC.Models.IncomeModel>
+
+
+<h2>Incomes</h2>
+
+<a href="/Income/Create">Create</a>
+
+<table class="table table-responsive">
+    <tr>
+        <td>Name</td>
+        <td>Price</td>
+        <td>Type</td>
+        <td>
+            Actions
+        </td>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.PaymentDate</td>
+            <td>@item.Amount</td>
+            <td>@item.IncomeType</td>
+            <td>
+                <a href="/Expense/Edit/@item.Id">Edit</a>
+                <a href="/Expense/Delete/@item.Id">Delete</a>
+            </td>
+        </tr>
+    }
+</table>

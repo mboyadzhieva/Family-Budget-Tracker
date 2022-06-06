@@ -4,10 +4,19 @@
     using Microsoft.AspNetCore.Mvc;
     using System.Net.Http;
     using System.Net.Http.Json;
+    using Microsoft.AspNetCore.Http;
+    using System.Threading.Tasks;
+    using Newtonsoft.Json;
 
     public class AccountController : Controller
     {
-        private readonly string apiUrl = "https://localhost:5001/identity";
+        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly string apiUrl = "https://familybudgettrackerwebapi.azurewebsites.net/identity";
+
+        public AccountController(IHttpContextAccessor httpContextAccessor)
+        {
+            this.httpContextAccessor = httpContextAccessor;
+        }
 
         [HttpGet]
         public ActionResult Login()
@@ -16,16 +25,24 @@
         }
 
         [HttpPost]
-        public ActionResult Login(LoginModel model)
+        public async Task<ActionResult> Login(LoginModel model)
         {
             using (var client = new HttpClient())
             {
-                var postLogin = client.PostAsJsonAsync($"{apiUrl}/login", model);
-                postLogin.Wait();
+                var response = await client.PostAsJsonAsync($"{apiUrl}/login", model);
 
-                var result = postLogin.Result;
-                if (result.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
+                    //storing the response details received from the web api
+                    var loginResponse = response.Content.ReadAsStringAsync().Result;
+
+                    TokenModel tokenModel = JsonConvert.DeserializeObject<TokenModel>(loginResponse);
+
+                    CookieOptions options = new CookieOptions();
+                    Response.Cookies.Append("token", tokenModel.Token);
+
+                    //httpContextAccessor.HttpContext.Request.Cookies["token"] = token;
+
                     return RedirectToAction("Index", "Home");
                 }
             }

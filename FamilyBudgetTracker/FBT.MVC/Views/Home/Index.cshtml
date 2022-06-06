@@ -1,8 +1,10 @@
-﻿@{
+﻿@model FBT.MVC.Models.BudgetModel
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <p>Your current budget is: @Html.DisplayFor(model => model.CurrentBudget).</p>
 </div>

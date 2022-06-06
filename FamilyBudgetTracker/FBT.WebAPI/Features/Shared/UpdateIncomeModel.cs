@@ -1,17 +1,18 @@
-﻿namespace FBT.WebAPI.Features.Expenses
+﻿namespace FBT.WebAPI.Features.Shared
 {
     using System;
     using System.ComponentModel.DataAnnotations;
 
-    public class ExpenseRequestModel
+    public class UpdateIncomeModel
     {
+        public int Id { get; set; }
+
         [Required]
         public decimal Amount { get; set; }
 
         [Required]
         public DateTime PaymentDate { get; set; }
-                
-        public string ExpenseType { get; set; }
 
+        public string IncomeType { get; set; }
     }
 }

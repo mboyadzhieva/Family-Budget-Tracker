@@ -1,9 +1,9 @@
-﻿namespace FBT.WebAPI.Features.RecurringExpenses
+﻿namespace FBT.WebAPI.Features.Shared
 {
     using System;
     using System.ComponentModel.DataAnnotations;
 
-    public class RecurringExpenseRequestModel
+    public class ExpenseResponseModel
     {
         [Required]
         public decimal Amount { get; set; }

@@ -65,17 +65,20 @@
                 .ToList()
                 .ForEach(entry =>
                 {
-                    if (entry.Entity is Entity entity)
+                    //if (entry.Entity is IModifiableEntity entity)
+                    //{
+                    //    if (entry.State == EntityState.Modified
+                    //        && entry.Property("TotalAmount").IsModified)
+                    //    {
+                    //        entity.ModifiedOn = DateTime.UtcNow;
+                    //    }
+                    //}
+                    if (entry.Entity is DeletableEntity deletableEntity)
                     {
-                        if (entry.State == EntityState.Modified 
-                            && entry.Property("TotalAmount").IsModified)
+                        if (entry.State == EntityState.Deleted)
                         {
-                            entity.ModifiedOn = DateTime.UtcNow;
-                        }
-                        else if (entry.State == EntityState.Deleted)
-                        {
-                            entity.DeletedOn = DateTime.UtcNow;
-                            entity.IsDeleted = true;
+                            deletableEntity.DeletedOn = DateTime.UtcNow;
+                            deletableEntity.IsDeleted = true;
 
                             entry.State = EntityState.Modified;
                         }

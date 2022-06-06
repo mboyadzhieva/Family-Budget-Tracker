@@ -2,10 +2,8 @@
 {
     using System;
 
-    public abstract class Entity
+    public abstract class DeletableEntity
     {
-        public DateTime? ModifiedOn { get; set; }
-
         public DateTime? DeletedOn { get; set; }
 
         public bool IsDeleted { get; set; }

@@ -1,9 +1,9 @@
-﻿namespace FBT.WebAPI.Features.RecurringIncomes
+﻿namespace FBT.WebAPI.Features.Shared
 {
     using System;
     using System.ComponentModel.DataAnnotations;
 
-    public class RecurringIncomeRequestModel
+    public class IncomeResponseModel
     {
         [Required]
         public decimal Amount { get; set; }
@@ -14,3 +14,4 @@
         public string IncomeType { get; set; }
     }
 }
+

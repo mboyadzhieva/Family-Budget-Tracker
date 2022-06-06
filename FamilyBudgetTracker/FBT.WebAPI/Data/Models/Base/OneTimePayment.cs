@@ -3,7 +3,7 @@
     using System;
     using System.ComponentModel.DataAnnotations;
 
-    public abstract class OneTimePayment : Entity
+    public abstract class OneTimePayment : DeletableEntity
     {
         public int Id { get; set; }
 

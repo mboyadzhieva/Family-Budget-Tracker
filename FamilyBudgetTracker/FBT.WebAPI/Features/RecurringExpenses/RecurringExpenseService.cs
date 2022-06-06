@@ -7,6 +7,9 @@
     using System.Linq;
     using System.Security.Claims;
     using System.Threading.Tasks;
+    using Shared;
+    using System.Collections.Generic;
+    using Microsoft.EntityFrameworkCore;
 
     public class RecurringExpenseService : IRecurringExpenseService
     {
@@ -21,7 +24,22 @@
             this.mapper = mapper;
             this.dbContext = dbContext;
         }
-        public async Task<int> Create(RecurringExpenseRequestModel model)
+
+        public async Task<IEnumerable<ExpenseResponseModel>> GetAll()
+        {
+            var userId = user
+                .Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)
+                ?.Value;
+
+            return await this.dbContext
+                .RecurringExpenses
+                .Where(re => re.UserId == userId)
+                .Select(re => mapper.Map<ExpenseResponseModel>(re))
+                .ToListAsync();
+        }
+
+        public async Task<int> Create(CreateExpenseModel model)
         {
             string userId = user
                 .Claims
@@ -30,12 +48,27 @@
 
             var recurringExpense = mapper.Map<RecurringExpense>(model);
             recurringExpense.UserId = userId;
-            recurringExpense.TotalAmount = 0M;
+            recurringExpense.TotalAmount = recurringExpense.Amount;
 
             this.dbContext.Add(recurringExpense);
             await this.dbContext.SaveChangesAsync();
 
             return recurringExpense.Id;
+        }
+
+        public async Task<bool> Update(UpdateExpenseModel model)
+        {
+            var recurringExpense = await this.dbContext.RecurringExpenses.FindAsync(model.Id);
+
+            if (recurringExpense != null)
+            {
+                mapper.Map(model, recurringExpense);
+                await this.dbContext.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

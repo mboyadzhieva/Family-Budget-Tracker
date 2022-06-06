@@ -3,6 +3,7 @@
     using AutoMapper;
     using FBT.WebAPI.Data;
     using FBT.WebAPI.Data.Models;
+    using FBT.WebAPI.Features.Budget;
     using FBT.WebAPI.Features.Expenses;
     using FBT.WebAPI.Features.Identity;
     using FBT.WebAPI.Features.Incomes;
@@ -87,7 +88,8 @@
                .AddTransient<IExpenseService, ExpenseService>()
                .AddTransient<IIncomeService, IncomeService>()
                .AddTransient<IRecurringExpenseService, RecurringExpenseService>()
-               .AddTransient<IRecurringIncomeService, RecurringIncomeService>();
+               .AddTransient<IRecurringIncomeService, RecurringIncomeService>()
+               .AddTransient<IBudgetService, BudgetService>();
 
             return services;
         }

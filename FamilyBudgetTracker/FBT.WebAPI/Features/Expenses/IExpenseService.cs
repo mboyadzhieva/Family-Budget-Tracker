@@ -1,9 +1,15 @@
-﻿using System.Threading.Tasks;
-
-namespace FBT.WebAPI.Features.Expenses
+﻿namespace FBT.WebAPI.Features.Expenses
 {
+    using Shared;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
     public interface IExpenseService
     {
-        Task<int> Create(ExpenseRequestModel model);
+        Task<IEnumerable<ExpenseResponseModel>> GetAll();
+
+        Task<int> Create(CreateExpenseModel model);
+
+        Task<bool> Update(UpdateExpenseModel model);
     }
 }

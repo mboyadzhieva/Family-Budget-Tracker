@@ -7,6 +7,9 @@
     using System.Linq;
     using System.Security.Claims;
     using System.Threading.Tasks;
+    using Shared;
+    using System.Collections.Generic;
+    using Microsoft.EntityFrameworkCore;
 
     public class RecurringIncomeService : IRecurringIncomeService
     {
@@ -21,7 +24,22 @@
             this.mapper = mapper;
             this.dbContext = dbContext;
         }
-        public async Task<int> Create(RecurringIncomeRequestModel model)
+
+        public async Task<IEnumerable<IncomeResponseModel>> GetAll()
+        {
+            var userId = user
+                .Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)
+                ?.Value;
+
+            return await this.dbContext
+                .RecurringIncomes
+                .Where(ri => ri.UserId == userId)
+                .Select(ri => mapper.Map<IncomeResponseModel>(ri))
+                .ToListAsync();
+        }
+
+        public async Task<int> Create(CreateIncomeModel model)
         {
             string userId = user
                 .Claims
@@ -30,12 +48,27 @@
 
             var recurringIncome = mapper.Map<RecurringIncome>(model);
             recurringIncome.UserId = userId;
-            recurringIncome.TotalAmount = 0M;
+            recurringIncome.TotalAmount = recurringIncome.Amount;
 
             this.dbContext.Add(recurringIncome);
             await this.dbContext.SaveChangesAsync();
 
             return recurringIncome.Id;
+        }
+
+        public async Task<bool> Update(UpdateIncomeModel model)
+        {
+            var recurringIncome = await this.dbContext.RecurringIncomes.FindAsync(model.Id);
+
+            if (recurringIncome != null)
+            {
+                mapper.Map(model, recurringIncome);
+                await this.dbContext.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

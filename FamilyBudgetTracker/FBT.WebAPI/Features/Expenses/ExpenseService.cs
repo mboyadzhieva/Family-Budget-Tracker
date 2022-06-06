@@ -7,6 +7,9 @@
     using System.Linq;
     using System.Security.Claims;
     using System.Threading.Tasks;
+    using Shared;
+    using System.Collections.Generic;
+    using Microsoft.EntityFrameworkCore;
 
     public class ExpenseService : IExpenseService
     {
@@ -22,7 +25,21 @@
             this.dbContext = dbContext;
         }
 
-        public async Task<int> Create(ExpenseRequestModel model)
+        public async Task<IEnumerable<ExpenseResponseModel>> GetAll()
+        {
+            var userId = user
+                .Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)
+                ?.Value;
+
+            return await this.dbContext
+                .Expenses
+                .Where(e => e.UserId == userId)
+                .Select(e => mapper.Map<ExpenseResponseModel>(e))
+                .ToListAsync();
+        }
+
+        public async Task<int> Create(CreateExpenseModel model)
         {
             string userId = user
                 .Claims
@@ -36,6 +53,21 @@
             await this.dbContext.SaveChangesAsync();
 
             return expense.Id;
+        }
+
+        public async Task<bool> Update(UpdateExpenseModel model)
+        {
+            var expense = await this.dbContext.Expenses.FindAsync(model.Id);
+
+            if (expense != null)
+            {
+                mapper.Map(model, expense);
+                await this.dbContext.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

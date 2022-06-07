@@ -36,7 +36,6 @@
                 .Expenses
                 .Where(e => e.UserId == userId)
                 .Select(e => mapper.Map<ExpenseModel>(e))
-                .OrderBy(e => e.PaymentDate)
                 .ToListAsync();
         }
 

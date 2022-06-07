@@ -36,7 +36,6 @@
                 .RecurringExpenses
                 .Where(re => re.UserId == userId)
                 .Select(re => mapper.Map<ExpenseModel>(re))
-                .OrderBy(re => re.PaymentDate)
                 .ToListAsync();
         }
 

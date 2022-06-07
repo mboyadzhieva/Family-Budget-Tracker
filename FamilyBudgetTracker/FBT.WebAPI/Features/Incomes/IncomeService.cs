@@ -36,7 +36,6 @@
                 .Incomes
                 .Where(i => i.UserId == userId)
                 .Select(i => mapper.Map<IncomeModel>(i))
-                .OrderBy(i => i.PaymentDate)
                 .ToListAsync();
         }
 

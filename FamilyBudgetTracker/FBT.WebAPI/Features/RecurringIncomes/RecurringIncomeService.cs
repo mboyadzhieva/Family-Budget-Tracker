@@ -36,7 +36,6 @@
                 .RecurringIncomes
                 .Where(ri => ri.UserId == userId)
                 .Select(ri => mapper.Map<IncomeModel>(ri))
-                .OrderBy(ri => ri.PaymentDate)
                 .ToListAsync();
         }
 

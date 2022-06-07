@@ -1,9 +1,8 @@
-﻿using System;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-
-namespace FBT.MVC.Models
+﻿namespace FBT.MVC.Models
 {
+    using System;
+    using System.ComponentModel.DataAnnotations;
+
     public class ExpenseModel
     {
         public int Id { get; set; }
@@ -13,18 +12,16 @@ namespace FBT.MVC.Models
         public string ExpenseType { get; set; }
 
         [Required]
-        //[RegularExpression(@"^\d+\.\d{0,2}$")]
-        //[Range(0, 9999999999999999.99)]
-        //[DataType(DataType.Currency)]
         [DisplayFormat(ApplyFormatInEditMode = true)]
         public decimal Amount { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true)]
-        [DisplayName("Payment Date")]
+        [Display(Name = "Payment Date")]
         public DateTime PaymentDate { get; set; }
 
+        [Display(Name = "Do you want to add this expense as recurring?")]
         public bool IsRecurring { get; set; }
     }
 }

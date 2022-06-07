@@ -12,7 +12,6 @@
         public string IncomeType { get; set; }
 
         [Required]
-        [DataType(DataType.Currency)]
         [DisplayFormat(ApplyFormatInEditMode = true)]
         public decimal Amount { get; set; }
 
@@ -22,6 +21,7 @@
         [Display(Name = "Payment Date")]
         public DateTime PaymentDate { get; set; }
 
+        [Display(Name = "Do you want to add this income as recurring?")]
         public bool IsRecurring { get; set; }
     }
 }

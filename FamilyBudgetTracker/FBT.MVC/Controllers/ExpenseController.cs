@@ -1,15 +1,15 @@
-﻿using FBT.MVC.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-
-namespace FBT.MVC.Controllers
+﻿namespace FBT.MVC.Controllers
 {
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Models;
+    using Newtonsoft.Json;
+    using System.Collections.Generic;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Net.Http.Json;
+    using System.Threading.Tasks;
+
     public class ExpenseController : Controller
     {
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -43,7 +43,7 @@ namespace FBT.MVC.Controllers
                 var expensesPostRequestResponse = await client.GetAsync($"{apiUrl}/expenses");
                 var recurringExpensesPostRequestResponse = await client.GetAsync($"{apiUrl}/recurringExpenses");
 
-                if (expensesPostRequestResponse.IsSuccessStatusCode 
+                if (expensesPostRequestResponse.IsSuccessStatusCode
                     && recurringExpensesPostRequestResponse.IsSuccessStatusCode)
                 {
                     var expensesResult = expensesPostRequestResponse.Content.ReadAsStringAsync().Result;
@@ -144,11 +144,10 @@ namespace FBT.MVC.Controllers
                 {
                     var expenseResult = response.Content.ReadAsStringAsync().Result;
 
-                   expense = JsonConvert.DeserializeObject<ExpenseModel>(expenseResult);
+                    expense = JsonConvert.DeserializeObject<ExpenseModel>(expenseResult);
                 }
             }
 
-            //ModelState.AddModelError(string.Empty, "Server Error!");
             return View("~/Views/Expense/Form.cshtml", expense);
         }
 
@@ -190,9 +189,46 @@ namespace FBT.MVC.Controllers
             return View(model);
         }
 
-        private void PrepareClienr(HttpClient client)
+        [HttpGet]
+        public async Task<ActionResult> Delete(int id, bool isRecurring)
         {
+            using (var client = new HttpClient())
+            {
+                var token = httpContextAccessor.HttpContext.Request.Cookies["token"];
 
+                if (token == null)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                string tokenValue = token.ToString();
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenValue);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JSON_MEDIA_TYPE));
+
+                HttpResponseMessage response = new HttpResponseMessage();
+
+                if (isRecurring)
+                {
+                    response = await client.GetAsync($"{apiUrl}/recurringExpenses/{id}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        await client.DeleteAsync($"{apiUrl}/recurringExpenses/{id}");
+                    }
+                }
+                else
+                {
+                    response = await client.GetAsync($"{apiUrl}/expenses/{id}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        await client.DeleteAsync($"{apiUrl}/expenses/{id}");
+                    }
+                }
+            }
+
+            return RedirectToAction("Index");
         }
     }
 }

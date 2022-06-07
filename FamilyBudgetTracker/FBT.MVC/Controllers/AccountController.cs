@@ -1,12 +1,12 @@
 ﻿namespace FBT.MVC.Controllers
 {
-    using Models;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Models;
+    using Newtonsoft.Json;
     using System.Net.Http;
     using System.Net.Http.Json;
-    using Microsoft.AspNetCore.Http;
     using System.Threading.Tasks;
-    using Newtonsoft.Json;
 
     public class AccountController : Controller
     {

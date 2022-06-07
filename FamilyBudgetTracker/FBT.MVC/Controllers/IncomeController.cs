@@ -189,5 +189,47 @@ namespace FBT.MVC.Controllers
             ModelState.AddModelError(string.Empty, "Server Error!");
             return View(model);
         }
+
+        [HttpGet]
+        public async Task<ActionResult> Delete(int id, bool isRecurring)
+        {
+            using (var client = new HttpClient())
+            {
+                var token = httpContextAccessor.HttpContext.Request.Cookies["token"];
+
+                if (token == null)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                string tokenValue = token.ToString();
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenValue);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JSON_MEDIA_TYPE));
+
+                HttpResponseMessage response = new HttpResponseMessage();
+
+                if (isRecurring)
+                {
+                    response = await client.GetAsync($"{apiUrl}/recurringIncomes/{id}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        await client.DeleteAsync($"{apiUrl}/recurringIncomes/{id}");
+                    }
+                }
+                else
+                {
+                    response = await client.GetAsync($"{apiUrl}/incomes/{id}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        await client.DeleteAsync($"{apiUrl}/incomes/{id}");
+                    }
+                }
+            }
+
+            return RedirectToAction("Index");
+        }
     }
 }

@@ -22,7 +22,8 @@
             <td>@item.PaymentDate.ToString("dd-MMMM-yyyy")</td>
             <td>@item.Amount</td>
             <td>@item.ExpenseType</td>
-            <td>@{
+            <td>
+                @{
                     if (@item.IsRecurring)
                     {
                         <span>Yes</span>
@@ -35,7 +36,7 @@
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new { id = item.Id, isRecurring = item.IsRecurring}, null)
-                <a href="/Expense/Delete/@item.Id">Delete</a>
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id, isRecurring = item.IsRecurring}, null)
             </td>
         </tr>
     }

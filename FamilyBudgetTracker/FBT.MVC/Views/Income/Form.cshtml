@@ -8,7 +8,7 @@
         <input type="hidden" name="id" value="@Model.IsRecurring" />
     }
     else
-    {        
+    {
         <h2>Create Income</h2>
     }
 
@@ -79,11 +79,9 @@
         @{
             if (Model == null)
             {
-                <div class="form-group">
-                    @Html.LabelFor(model => model.IsRecurring, htmlAttributes: new { @class = "control-label" })
-                    <div class="col-md-10">
-                        @Html.CheckBoxFor(model => model.IsRecurring, new { @class = "form-control" })
-                    </div>
+                <div class="form-check">
+                    @Html.LabelFor(model => model.IsRecurring, htmlAttributes: new { @class = "form-conrol form-check-label" })
+                    @Html.EditorFor(model => model.IsRecurring, new { @class = "form-conrol form-check-input" })
                 </div>
             }
         }

@@ -1,14 +1,13 @@
 ﻿namespace FBT.MVC.Controllers
 {
-    using Models;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
+    using Models;
+    using Newtonsoft.Json;
     using System.Diagnostics;
     using System.Net.Http;
-    using System.Net.Http.Json;
-    using Microsoft.AspNetCore.Http;
     using System.Net.Http.Headers;
-    using Newtonsoft.Json;
     using System.Threading.Tasks;
 
     public class HomeController : Controller
@@ -47,9 +46,8 @@
 
                 if (response.IsSuccessStatusCode && token != null)
                 {
-                    //storing the response details received from the web api
                     var budgetResponse = response.Content.ReadAsStringAsync().Result;
-                    //deserializing the response and storing it into the list
+                    
                     budget = JsonConvert.DeserializeObject<BudgetModel>(budgetResponse);
                 }
             }

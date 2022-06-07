@@ -1,7 +1,7 @@
 ﻿namespace FBT.WebAPI.Features.Identity
 {
-    using Data.Models;
     using AutoMapper;
+    using Data.Models;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;

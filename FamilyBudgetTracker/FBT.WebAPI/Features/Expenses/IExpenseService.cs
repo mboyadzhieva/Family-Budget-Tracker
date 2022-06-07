@@ -13,5 +13,7 @@
         Task<int> Create(CreateExpenseModel model);
 
         Task<bool> Update(ExpenseModel model);
+
+        Task<bool> Delete(int id);
     }
 }

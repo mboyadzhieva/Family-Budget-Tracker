@@ -1,15 +1,15 @@
 ﻿namespace FBT.WebAPI.Features.RecurringExpenses
 {
     using AutoMapper;
-    using FBT.WebAPI.Data;
-    using FBT.WebAPI.Data.Models;
+    using Data;
+    using Data.Models;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.EntityFrameworkCore;
+    using Shared;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Security.Claims;
     using System.Threading.Tasks;
-    using Shared;
-    using System.Collections.Generic;
-    using Microsoft.EntityFrameworkCore;
 
     public class RecurringExpenseService : IRecurringExpenseService
     {
@@ -36,6 +36,7 @@
                 .RecurringExpenses
                 .Where(re => re.UserId == userId)
                 .Select(re => mapper.Map<ExpenseModel>(re))
+                .OrderBy(re => re.PaymentDate)
                 .ToListAsync();
         }
 
@@ -55,7 +56,6 @@
 
             var recurringExpense = mapper.Map<RecurringExpense>(model);
             recurringExpense.UserId = userId;
-            recurringExpense.TotalAmount = recurringExpense.Amount;
 
             this.dbContext.Add(recurringExpense);
             await this.dbContext.SaveChangesAsync();
@@ -76,6 +76,26 @@
             }
 
             return false;
+        }
+
+        public async Task<bool> Delete(int id)
+        {
+            var recurringExpense = await this.dbContext
+                .RecurringExpenses
+                .Where(x => x.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (recurringExpense != null)
+            {
+                this.dbContext.Remove(recurringExpense);
+                await this.dbContext.SaveChangesAsync();
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

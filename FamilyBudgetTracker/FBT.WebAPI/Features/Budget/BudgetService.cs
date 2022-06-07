@@ -24,134 +24,97 @@
         {
             var budget = 0M;
 
-            this.dbContext
-                .Incomes
-                .Where(i => i.UserId == userId)
-                .Select(i => mapper.Map<IncomeModel>(i))
-                .ToList()
-                .ForEach(i =>
-                {
-                    budget += i.Amount;
-                });
+            budget += this.CalculateOneTimeIncomes(userId);
 
-            this.dbContext
-                .Expenses
-                .Where(e => e.UserId == userId)
-                .Select(e => mapper.Map<ExpenseModel>(e))
-                .ToList()
-                .ForEach(e =>
-                {
-                    budget -= e.Amount;
-                });
+            budget += this.CalculateRecurringIncomes(userId);
 
-            var recurring = this.UpdateRecurringPayments(userId);
-            budget += recurring;
+            budget += this.CalculateOneTimeExpenses(userId);
+
+            budget += this.CalculateRecurringExpenses(userId);
 
             return budget;
         }
 
-        private decimal UpdateRecurringPayments(string userId)
+        private decimal CalculateOneTimeIncomes(string userId)
         {
-            var recurringBudget = 0M;
+            var result = 0M;
+
+            this.dbContext
+                .Incomes
+                .Where(i => i.UserId == userId && i.PaymentDate <= DateTime.UtcNow)
+                .Select(i => mapper.Map<IncomeModel>(i))
+                .ToList()
+                .ForEach(i =>
+                {
+                    result += i.Amount;
+                });
+
+            return result;
+        }
+
+        private decimal CalculateOneTimeExpenses(string userId)
+        {
+            var result = 0M;
+
+            this.dbContext
+                .Expenses
+                .Where(e => e.UserId == userId && e.PaymentDate <= DateTime.UtcNow)
+                .Select(e => mapper.Map<ExpenseModel>(e))
+                .ToList()
+                .ForEach(e =>
+                {
+                    result -= e.Amount;
+                });
+
+            return result;
+        }
+
+        private decimal CalculateRecurringIncomes(string userId)
+        {
+            var result = 0M;
 
             this.dbContext
                 .RecurringIncomes
-                .Where(ri => ri.UserId == userId)
+                .Where(ri => ri.UserId == userId && ri.PaymentDate.Date <= DateTime.UtcNow.Date)
                 .ToList()
                 .ForEach(ri =>
                 {
-                    if (ri.ModifiedOn != null)
-                    {
-                        var modifiedDate = (DateTime)ri.ModifiedOn;
+                    var currentDate = DateTime.UtcNow.Date;
+                    var paymentDate = ri.PaymentDate.Date;
 
-                        if (modifiedDate.Date < DateTime.UtcNow.Date
-                            && (modifiedDate.Month != DateTime.UtcNow.Month))
-                        {
-                            ri.TotalAmount += ri.Amount;
-                            ri.ModifiedOn = ri.PaymentDate.AddMonths(1);
+                    var passedMonths = Math.Abs((currentDate - paymentDate).Days) / 30;
 
-                            this.dbContext.SaveChanges();
+                    ri.TotalAmount = ri.Amount * (passedMonths + 1);
 
-                            recurringBudget += ri.TotalAmount;
-
-                            //recurringBudget += (ri.TotalAmount + ri.Amount);
-                        }
-                        else
-                        {
-                            recurringBudget += ri.TotalAmount;
-                        }
-                    }
-                    else
-                    {
-                        if (ri.PaymentDate.Date < DateTime.UtcNow.Date
-                            && (ri.PaymentDate.Month != DateTime.UtcNow.Month))
-                        {
-                            ri.TotalAmount += ri.Amount;
-                            ri.ModifiedOn = ri.PaymentDate.AddMonths(1);
-
-                            this.dbContext.SaveChanges();
-
-                            recurringBudget += ri.TotalAmount;
-
-                            // recurringBudget += (ri.TotalAmount + ri.Amount);
-                        }
-                        else
-                        {
-                            recurringBudget += ri.Amount;
-                        }
-                    }
+                    this.dbContext.SaveChanges();
+                    result += ri.TotalAmount;
                 });
+
+            return result;
+        }
+
+        private decimal CalculateRecurringExpenses(string userId)
+        {
+            var result = 0M;
 
             this.dbContext
                 .RecurringExpenses
-                .Where(re => re.UserId == userId)
+                .Where(re => re.UserId == userId && re.PaymentDate.Date <= DateTime.UtcNow.Date)
                 .ToList()
                 .ForEach(re =>
                 {
-                    if (re.ModifiedOn != null)
-                    {
-                        var modifiedDate = (DateTime)re.ModifiedOn;
+                    var currentDate = DateTime.UtcNow.Date; // 7-june-2022 
+                    var paymentDate = re.PaymentDate.Date; // 5-may-2022 // 8-may-2022
 
-                        // check if total amount was updated for the current month's expenses
-                        if (modifiedDate.Day < DateTime.UtcNow.Day
-                            && (modifiedDate.Month != DateTime.UtcNow.Month))
-                        {
-                            re.TotalAmount += re.Amount;
-                            re.ModifiedOn = re.PaymentDate.AddMonths(1);
+                    var passedMonths = Math.Abs((currentDate - paymentDate).Days) / 30; // 33 days == 1 month
 
-                            this.dbContext.SaveChanges();
+                    re.TotalAmount = re.Amount * (passedMonths + 1);
 
-                            recurringBudget -= re.TotalAmount;
-
-                            // recurringBudget -= (re.TotalAmount + re.Amount);
-                        }
-                        else
-                        {
-                            recurringBudget -= re.TotalAmount;
-                        }
-                    }
-                    else
-                    {
-                        if (re.PaymentDate.Date < DateTime.UtcNow.Date
-                            && (re.PaymentDate.Month != DateTime.UtcNow.Month))
-                        {
-                            re.TotalAmount += re.Amount;
-                            re.ModifiedOn = re.PaymentDate.AddMonths(1);
-
-                            this.dbContext.SaveChanges();
-
-                            recurringBudget -= re.TotalAmount;
-
-                            // recurringBudget -= (re.TotalAmount + re.Amount);
-                        }
-                        else
-                        {
-                            recurringBudget -= re.Amount;
-                        }
-                    }
+                    this.dbContext.SaveChanges();
+                    result -= re.TotalAmount;
                 });
 
-            return recurringBudget;
+            return result;
         }
     }
 }

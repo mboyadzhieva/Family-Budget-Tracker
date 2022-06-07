@@ -1,13 +1,13 @@
 ﻿namespace FBT.WebAPI.Data
 {
-    using Models;
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
-    using System.Linq;
+    using Models;
+    using Models.Base;
     using System;
-    using FBT.WebAPI.Data.Models.Base;
-    using System.Threading.Tasks;
+    using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     public class FamilyBudgetTrackerDbContext : IdentityDbContext<User>
     {
@@ -65,14 +65,6 @@
                 .ToList()
                 .ForEach(entry =>
                 {
-                    //if (entry.Entity is IModifiableEntity entity)
-                    //{
-                    //    if (entry.State == EntityState.Modified
-                    //        && entry.Property("TotalAmount").IsModified)
-                    //    {
-                    //        entity.ModifiedOn = DateTime.UtcNow;
-                    //    }
-                    //}
                     if (entry.Entity is DeletableEntity deletableEntity)
                     {
                         if (entry.State == EntityState.Deleted)

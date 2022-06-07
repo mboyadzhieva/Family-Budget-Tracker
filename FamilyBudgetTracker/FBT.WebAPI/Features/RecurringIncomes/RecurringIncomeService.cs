@@ -1,15 +1,15 @@
 ﻿namespace FBT.WebAPI.Features.RecurringIncomes
 {
     using AutoMapper;
-    using FBT.WebAPI.Data;
-    using FBT.WebAPI.Data.Models;
+    using Data;
+    using Data.Models;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.EntityFrameworkCore;
+    using Shared;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Security.Claims;
     using System.Threading.Tasks;
-    using Shared;
-    using System.Collections.Generic;
-    using Microsoft.EntityFrameworkCore;
 
     public class RecurringIncomeService : IRecurringIncomeService
     {
@@ -36,6 +36,7 @@
                 .RecurringIncomes
                 .Where(ri => ri.UserId == userId)
                 .Select(ri => mapper.Map<IncomeModel>(ri))
+                .OrderBy(ri => ri.PaymentDate)
                 .ToListAsync();
         }
 
@@ -55,7 +56,6 @@
 
             var recurringIncome = mapper.Map<RecurringIncome>(model);
             recurringIncome.UserId = userId;
-            recurringIncome.TotalAmount = recurringIncome.Amount;
 
             this.dbContext.Add(recurringIncome);
             await this.dbContext.SaveChangesAsync();
@@ -76,6 +76,26 @@
             }
 
             return false;
+        }
+
+        public async Task<bool> Delete(int id)
+        {
+            var recurringIncomes = await this.dbContext
+                .RecurringIncomes
+                .Where(x => x.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (recurringIncomes != null)
+            {
+                this.dbContext.Remove(recurringIncomes);
+                await this.dbContext.SaveChangesAsync();
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

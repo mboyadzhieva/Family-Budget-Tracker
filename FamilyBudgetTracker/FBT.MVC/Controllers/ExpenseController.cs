@@ -69,7 +69,7 @@ namespace FBT.MVC.Controllers
         [HttpGet]
         public ActionResult Create()
         {
-            return View();
+            return View("~/Views/Expense/Form.cshtml");
         }
 
         [HttpPost]
@@ -107,12 +107,14 @@ namespace FBT.MVC.Controllers
             }
 
             ModelState.AddModelError(string.Empty, "Server Error!");
-            return View(model);
+            return View("~/Views/Expense/Form.cshtml", model);
         }
 
         [HttpGet]
-        public async Task<ActionResult> Edit(ExpenseModel model)
+        public async Task<ActionResult> Edit(int id, bool isRecurring)
         {
+            ExpenseModel expense = new ExpenseModel();
+
             using (var client = new HttpClient())
             {
                 var token = httpContextAccessor.HttpContext.Request.Cookies["token"];
@@ -129,23 +131,25 @@ namespace FBT.MVC.Controllers
 
                 HttpResponseMessage response = new HttpResponseMessage();
 
-                if (model.IsRecurring)
+                if (isRecurring)
                 {
-                    response = await client.PostAsJsonAsync($"{apiUrl}/recurringExpenses", model.Id);
+                    response = await client.GetAsync($"{apiUrl}/recurringExpenses/{id}");
                 }
                 else
                 {
-                    response = await client.PostAsJsonAsync($"{apiUrl}/expenses", model.Id);
+                    response = await client.GetAsync($"{apiUrl}/expenses/{id}");
                 }
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return RedirectToAction("Index");
+                    var expenseResult = response.Content.ReadAsStringAsync().Result;
+
+                   expense = JsonConvert.DeserializeObject<ExpenseModel>(expenseResult);
                 }
             }
 
-            ModelState.AddModelError(string.Empty, "Server Error!");
-            return View("~/Views/Expense/Create.cshtml", model);
+            //ModelState.AddModelError(string.Empty, "Server Error!");
+            return View("~/Views/Expense/Form.cshtml", expense);
         }
 
         [HttpPost]
@@ -169,11 +173,11 @@ namespace FBT.MVC.Controllers
 
                 if (model.IsRecurring)
                 {
-                    response = await client.PostAsJsonAsync($"{apiUrl}/recurringExpenses", model);
+                    response = await client.PutAsJsonAsync($"{apiUrl}/recurringExpenses", model);
                 }
                 else
                 {
-                    response = await client.PostAsJsonAsync($"{apiUrl}/expenses", model);
+                    response = await client.PutAsJsonAsync($"{apiUrl}/expenses", model);
                 }
 
                 if (response.IsSuccessStatusCode)
@@ -184,6 +188,11 @@ namespace FBT.MVC.Controllers
 
             ModelState.AddModelError(string.Empty, "Server Error!");
             return View(model);
+        }
+
+        private void PrepareClienr(HttpClient client)
+        {
+
         }
     }
 }

@@ -1,15 +1,15 @@
 ﻿namespace FBT.WebAPI.Features.Expenses
 {
     using AutoMapper;
-    using FBT.WebAPI.Data;
-    using FBT.WebAPI.Data.Models;
+    using Data;
+    using Data.Models;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.EntityFrameworkCore;
+    using Shared;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Security.Claims;
     using System.Threading.Tasks;
-    using Shared;
-    using System.Collections.Generic;
-    using Microsoft.EntityFrameworkCore;
 
     public class ExpenseService : IExpenseService
     {
@@ -36,6 +36,7 @@
                 .Expenses
                 .Where(e => e.UserId == userId)
                 .Select(e => mapper.Map<ExpenseModel>(e))
+                .OrderBy(e => e.PaymentDate)
                 .ToListAsync();
         }
 
@@ -75,6 +76,26 @@
             }
 
             return false;
+        }
+
+        public async Task<bool> Delete(int id)
+        {
+            var expense = await this.dbContext
+                .Expenses
+                .Where(x => x.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (expense != null)
+            {
+                this.dbContext.Remove(expense);
+                await this.dbContext.SaveChangesAsync();
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
     }

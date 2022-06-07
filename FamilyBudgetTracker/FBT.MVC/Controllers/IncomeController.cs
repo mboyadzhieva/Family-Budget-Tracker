@@ -69,7 +69,7 @@ namespace FBT.MVC.Controllers
         [HttpGet]
         public ActionResult Create()
         {
-            return View();
+            return View("~/Views/Income/Form.cshtml");
         }
 
         [HttpPost]
@@ -89,7 +89,6 @@ namespace FBT.MVC.Controllers
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenValue);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JSON_MEDIA_TYPE));
 
-
                 HttpResponseMessage response = new HttpResponseMessage();
 
                 if (model.IsRecurring)
@@ -99,6 +98,86 @@ namespace FBT.MVC.Controllers
                 else
                 {
                     response = await client.PostAsJsonAsync($"{apiUrl}/incomes", model);
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Index");
+                }
+            }
+
+            ModelState.AddModelError(string.Empty, "Server Error!");
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Edit(int id, bool isRecurring)
+        {
+            IncomeModel income = new IncomeModel();
+
+            using (var client = new HttpClient())
+            {
+                var token = httpContextAccessor.HttpContext.Request.Cookies["token"];
+
+                if (token == null)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                string tokenValue = token.ToString();
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenValue);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JSON_MEDIA_TYPE));
+
+                HttpResponseMessage response = new HttpResponseMessage();
+
+                if (isRecurring)
+                {
+                    response = await client.GetAsync($"{apiUrl}/recurringIncomes/{id}");
+                }
+                else
+                {
+                    response = await client.GetAsync($"{apiUrl}/incomes/{id}");
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var incomeResult = response.Content.ReadAsStringAsync().Result;
+
+                    income = JsonConvert.DeserializeObject<IncomeModel>(incomeResult);
+                }
+            }
+
+            //ModelState.AddModelError(string.Empty, "Server Error!");
+            return View("~/Views/Income/Form.cshtml", income);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Edit(IncomeModel model)
+        {
+            using (var client = new HttpClient())
+            {
+                var token = httpContextAccessor.HttpContext.Request.Cookies["token"];
+
+                if (token == null)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                string tokenValue = token.ToString();
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenValue);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JSON_MEDIA_TYPE));
+
+                HttpResponseMessage response = new HttpResponseMessage();
+
+                if (model.IsRecurring)
+                {
+                    response = await client.PutAsJsonAsync($"{apiUrl}/recurringIncomes", model);
+                }
+                else
+                {
+                    response = await client.PutAsJsonAsync($"{apiUrl}/incomes", model);
                 }
 
                 if (response.IsSuccessStatusCode)

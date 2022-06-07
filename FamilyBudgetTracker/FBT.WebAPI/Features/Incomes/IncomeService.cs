@@ -4,12 +4,12 @@
     using Data;
     using Data.Models;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.EntityFrameworkCore;
+    using Shared;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Security.Claims;
     using System.Threading.Tasks;
-    using Shared;
-    using System.Collections.Generic;
-    using Microsoft.EntityFrameworkCore;
 
     public class IncomeService : IIncomeService
     {
@@ -36,6 +36,7 @@
                 .Incomes
                 .Where(i => i.UserId == userId)
                 .Select(i => mapper.Map<IncomeModel>(i))
+                .OrderBy(i => i.PaymentDate)
                 .ToListAsync();
         }
 
@@ -75,6 +76,26 @@
             }
 
             return false;
+        }
+
+        public async Task<bool> Delete(int id)
+        {
+            var income = await this.dbContext
+                .Incomes
+                .Where(x => x.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (income != null)
+            {
+                this.dbContext.Remove(income);
+                await this.dbContext.SaveChangesAsync();
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

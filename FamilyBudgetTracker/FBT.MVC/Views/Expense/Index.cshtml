@@ -19,7 +19,7 @@
     @foreach (var item in Model)
     {
         <tr>
-            <td>@item.PaymentDate</td>
+            <td>@item.PaymentDate.ToString("dd-MMMM-yyyy")</td>
             <td>@item.Amount</td>
             <td>@item.ExpenseType</td>
             <td>@{
@@ -34,7 +34,7 @@
                 }
             </td>
             <td>
-                <a href="/Expense/Edit/@item.Id">Edit</a>
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id, isRecurring = item.IsRecurring}, null)
                 <a href="/Expense/Delete/@item.Id">Delete</a>
             </td>
         </tr>

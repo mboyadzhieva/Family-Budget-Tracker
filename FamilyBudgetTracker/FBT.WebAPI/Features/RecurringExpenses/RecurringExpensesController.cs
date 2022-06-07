@@ -2,9 +2,9 @@
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using System.Threading.Tasks;
     using Shared;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     [Authorize]
     public class RecurringExpensesController : ApiController
@@ -43,6 +43,20 @@
             var updated = await this.recurringExpense.Update(model);
 
             if (!updated)
+            {
+                return BadRequest();
+            }
+
+            return Ok();
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var deleted = await this.recurringExpense.Delete(id);
+
+            if (!deleted)
             {
                 return BadRequest();
             }

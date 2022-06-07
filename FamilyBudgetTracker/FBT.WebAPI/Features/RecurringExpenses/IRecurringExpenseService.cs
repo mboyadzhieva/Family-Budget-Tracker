@@ -1,8 +1,8 @@
 ﻿namespace FBT.WebAPI.Features.RecurringExpenses
 {
+    using Shared;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Shared;
 
     public interface IRecurringExpenseService
     {
@@ -13,5 +13,7 @@
         Task<int> Create(CreateExpenseModel model);
 
         Task<bool> Update(ExpenseModel model);
+
+        Task<bool> Delete(int id);
     }
 }

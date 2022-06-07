@@ -75,5 +75,19 @@
             ModelState.AddModelError(string.Empty, "Server Error!");
             return View(model);
         }
+
+        [HttpGet]
+        public ActionResult Logout()
+        {
+            if (httpContextAccessor.HttpContext.Request.Cookies["token"] != null)
+            {
+                Response.Cookies.Delete("token");
+                return RedirectToAction("Login");
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+        }
     }
 }

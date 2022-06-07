@@ -1,15 +1,15 @@
-﻿using FBT.MVC.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-
-namespace FBT.MVC.Controllers
+﻿namespace FBT.MVC.Controllers
 {
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Models;
+    using Newtonsoft.Json;
+    using System.Collections.Generic;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Net.Http.Json;
+    using System.Threading.Tasks;
+
     public class IncomeController : Controller
     {
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -148,7 +148,6 @@ namespace FBT.MVC.Controllers
                 }
             }
 
-            //ModelState.AddModelError(string.Empty, "Server Error!");
             return View("~/Views/Income/Form.cshtml", income);
         }
 

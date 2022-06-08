@@ -14,5 +14,7 @@
         public DateTime PaymentDate { get; set; }
 
         public string ExpenseType { get; set; }
+
+        public decimal TotalAmount { get; set; }
     }
 }

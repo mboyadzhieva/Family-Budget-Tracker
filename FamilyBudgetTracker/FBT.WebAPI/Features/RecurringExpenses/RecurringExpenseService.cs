@@ -3,6 +3,7 @@
     using AutoMapper;
     using Data;
     using Data.Models;
+    using FBT.WebAPI.Features.Budget;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
     using Shared;
@@ -17,12 +18,19 @@
         private readonly ClaimsPrincipal user;
         private readonly IMapper mapper;
         private readonly FamilyBudgetTrackerDbContext dbContext;
+        private readonly IBudgetService budget;
 
-        public RecurringExpenseService(IHttpContextAccessor httpContextAccessor, IMapper mapper, FamilyBudgetTrackerDbContext dbContext)
+        public RecurringExpenseService(
+            IHttpContextAccessor httpContextAccessor, 
+            IMapper mapper, 
+            FamilyBudgetTrackerDbContext dbContext,
+            IBudgetService budget
+            )
         {
             this.user = httpContextAccessor.HttpContext?.User;
             this.mapper = mapper;
             this.dbContext = dbContext;
+            this.budget = budget;
         }
 
         public async Task<IEnumerable<ExpenseModel>> GetAll()
@@ -56,6 +64,8 @@
             var recurringExpense = mapper.Map<RecurringExpense>(model);
             recurringExpense.UserId = userId;
 
+            budget.Calculate(userId);
+
             this.dbContext.Add(recurringExpense);
             await this.dbContext.SaveChangesAsync();
 
@@ -69,6 +79,8 @@
             if (recurringExpense != null)
             {
                 mapper.Map(model, recurringExpense);
+                budget.Calculate(recurringExpense.UserId);
+
                 await this.dbContext.SaveChangesAsync();
 
                 return true;

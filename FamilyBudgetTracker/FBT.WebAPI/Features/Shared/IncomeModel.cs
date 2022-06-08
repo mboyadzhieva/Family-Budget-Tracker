@@ -14,6 +14,8 @@
         public DateTime PaymentDate { get; set; }
 
         public string IncomeType { get; set; }
+
+        public decimal TotalAmount { get; set; }
     }
 }
 

@@ -3,6 +3,7 @@
     using AutoMapper;
     using Data;
     using Data.Models;
+    using Features.Budget;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
     using Shared;
@@ -17,12 +18,19 @@
         private readonly ClaimsPrincipal user;
         private readonly IMapper mapper;
         private readonly FamilyBudgetTrackerDbContext dbContext;
+        private readonly IBudgetService budget;
 
-        public RecurringIncomeService(IHttpContextAccessor httpContextAccessor, IMapper mapper, FamilyBudgetTrackerDbContext dbContext)
+        public RecurringIncomeService
+            (IHttpContextAccessor httpContextAccessor,
+            IMapper mapper,
+            FamilyBudgetTrackerDbContext dbContext,
+            IBudgetService budget
+            )
         {
             this.user = httpContextAccessor.HttpContext?.User;
             this.mapper = mapper;
             this.dbContext = dbContext;
+            this.budget = budget;
         }
 
         public async Task<IEnumerable<IncomeModel>> GetAll()
@@ -56,6 +64,8 @@
             var recurringIncome = mapper.Map<RecurringIncome>(model);
             recurringIncome.UserId = userId;
 
+            budget.Calculate(userId);
+
             this.dbContext.Add(recurringIncome);
             await this.dbContext.SaveChangesAsync();
 
@@ -69,6 +79,8 @@
             if (recurringIncome != null)
             {
                 mapper.Map(model, recurringIncome);
+                budget.Calculate(recurringIncome.UserId);
+
                 await this.dbContext.SaveChangesAsync();
 
                 return true;

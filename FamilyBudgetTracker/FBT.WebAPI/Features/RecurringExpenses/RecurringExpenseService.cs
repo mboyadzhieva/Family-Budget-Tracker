@@ -64,10 +64,9 @@
             var recurringExpense = mapper.Map<RecurringExpense>(model);
             recurringExpense.UserId = userId;
 
-            budget.Calculate(userId);
-
             this.dbContext.Add(recurringExpense);
             await this.dbContext.SaveChangesAsync();
+            budget.Calculate(userId);
 
             return recurringExpense.Id;
         }
@@ -80,9 +79,9 @@
             {
                 mapper.Map(model, recurringExpense);
                 recurringExpense.TotalAmount = 0M;
-                budget.Calculate(recurringExpense.UserId);
 
                 await this.dbContext.SaveChangesAsync();
+                budget.Calculate(recurringExpense.UserId);
 
                 return true;
             }

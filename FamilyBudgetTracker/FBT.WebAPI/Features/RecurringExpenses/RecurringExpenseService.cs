@@ -79,6 +79,7 @@
             if (recurringExpense != null)
             {
                 mapper.Map(model, recurringExpense);
+                recurringExpense.TotalAmount = 0M;
                 budget.Calculate(recurringExpense.UserId);
 
                 await this.dbContext.SaveChangesAsync();

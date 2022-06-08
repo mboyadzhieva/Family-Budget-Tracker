@@ -34,14 +34,13 @@
                 if (response.IsSuccessStatusCode)
                 {
                     //storing the response details received from the web api
-                    var loginResponse = response.Content.ReadAsStringAsync().Result;
+                    var loginResponseResult = response.Content.ReadAsStringAsync().Result;
 
-                    TokenModel tokenModel = JsonConvert.DeserializeObject<TokenModel>(loginResponse);
+                    // extracting token value
+                    TokenModel tokenModel = JsonConvert.DeserializeObject<TokenModel>(loginResponseResult);
 
-                    CookieOptions options = new CookieOptions();
+                    // saving token value in a cookie, that's stored in the browser
                     Response.Cookies.Append("token", tokenModel.Token);
-
-                    //httpContextAccessor.HttpContext.Request.Cookies["token"] = token;
 
                     return RedirectToAction("Index", "Home");
                 }
@@ -57,16 +56,14 @@
         }
 
         [HttpPost]
-        public ActionResult Register(RegisterModel model)
+        public async Task<ActionResult> Register(RegisterModel model)
         {
             using (var client = new HttpClient())
             {
-                var postRegister = client.PostAsJsonAsync($"{apiUrl}/register", model);
-                postRegister.Wait();
+                // sending user data to the API
+                var response = await client.PostAsJsonAsync($"{apiUrl}/register", model);
 
-                var result = postRegister.Result;
-
-                if (result.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
                     return RedirectToAction("Login");
                 }
@@ -79,15 +76,14 @@
         [HttpGet]
         public ActionResult Logout()
         {
+            // removing the saved cookie and redirecting user to login page
             if (httpContextAccessor.HttpContext.Request.Cookies["token"] != null)
             {
                 Response.Cookies.Delete("token");
                 return RedirectToAction("Login");
             }
-            else
-            {
-                return RedirectToAction("Index", "Home");
-            }
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }

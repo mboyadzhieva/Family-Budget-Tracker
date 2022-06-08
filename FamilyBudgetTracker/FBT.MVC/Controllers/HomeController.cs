@@ -47,7 +47,7 @@
                 if (response.IsSuccessStatusCode && token != null)
                 {
                     var budgetResponse = response.Content.ReadAsStringAsync().Result;
-                    
+
                     budget = JsonConvert.DeserializeObject<BudgetModel>(budgetResponse);
                 }
             }

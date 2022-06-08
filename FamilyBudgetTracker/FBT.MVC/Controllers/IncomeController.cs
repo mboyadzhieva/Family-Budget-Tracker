@@ -4,6 +4,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Models;
     using Newtonsoft.Json;
+    using System;
     using System.Collections.Generic;
     using System.Net.Http;
     using System.Net.Http.Headers;
@@ -52,6 +53,10 @@
                     JsonConvert.DeserializeObject<List<IncomeModel>>(incomesResult).ForEach(i =>
                     {
                         i.IsRecurring = false;
+                        if (i.PaymentDate <= DateTime.UtcNow)
+                        {
+                            i.TotalAmount = i.Amount;
+                        }
                         incomes.Add(i);
                     });
 

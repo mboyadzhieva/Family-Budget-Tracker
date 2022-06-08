@@ -23,5 +23,8 @@
 
         [Display(Name = "Do you want to add this income as recurring?")]
         public bool IsRecurring { get; set; }
+
+        [Display(Name = "Total Amount")]
+        public decimal TotalAmount { get; set; }
     }
 }

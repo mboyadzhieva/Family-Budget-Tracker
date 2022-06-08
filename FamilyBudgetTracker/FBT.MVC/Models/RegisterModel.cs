@@ -33,12 +33,5 @@
         [DataType(DataType.Password)]
         [StringLength(30, ErrorMessage = "Password must be between 4 and 30 characters!", MinimumLength = 4)]
         public string Password { get; set; }
-
-        [Required]
-        [DataType(DataType.Password)]
-        [StringLength(30, ErrorMessage = "Password must be between 4 and 30 characters!", MinimumLength = 4)]
-        [Display(Name = "Confirm Password")]
-        [Compare("Password")]
-        public string ConfirmPassword { get; set; }
     }
 }

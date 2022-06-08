@@ -4,6 +4,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Models;
     using Newtonsoft.Json;
+    using System;
     using System.Collections.Generic;
     using System.Net.Http;
     using System.Net.Http.Headers;
@@ -30,6 +31,7 @@
             {
                 var token = httpContextAccessor.HttpContext.Request.Cookies["token"];
 
+                // check to see if a JWT is present and if not, redirect to login
                 if (token == null)
                 {
                     return RedirectToAction("Login", "Account");
@@ -37,12 +39,15 @@
 
                 string tokenValue = token.ToString();
 
+                // add authorization header and content type headers to the HTTP request
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenValue);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JSON_MEDIA_TYPE));
 
+                // get all expenses (one-time and recurring)
                 var expensesPostRequestResponse = await client.GetAsync($"{apiUrl}/expenses");
                 var recurringExpensesPostRequestResponse = await client.GetAsync($"{apiUrl}/recurringExpenses");
 
+                // if the response is successfull, mark the recurring payments as such
                 if (expensesPostRequestResponse.IsSuccessStatusCode
                     && recurringExpensesPostRequestResponse.IsSuccessStatusCode)
                 {
@@ -52,6 +57,10 @@
                     JsonConvert.DeserializeObject<List<ExpenseModel>>(expensesResult).ForEach(e =>
                     {
                         e.IsRecurring = false;
+                        if (e.PaymentDate <= DateTime.UtcNow)
+                        {
+                            e.TotalAmount = e.Amount;
+                        }
                         expenses.Add(e);
                     });
 
@@ -91,6 +100,7 @@
 
                 HttpResponseMessage response = new HttpResponseMessage();
 
+                // send the newly created data to an API endpoint, depending on whether it's recurring or not
                 if (model.IsRecurring)
                 {
                     response = await client.PostAsJsonAsync($"{apiUrl}/recurringExpenses", model);
@@ -131,6 +141,7 @@
 
                 HttpResponseMessage response = new HttpResponseMessage();
 
+                // first step for editing an expense is getting all of its information
                 if (isRecurring)
                 {
                     response = await client.GetAsync($"{apiUrl}/recurringExpenses/{id}");
@@ -170,6 +181,7 @@
 
                 HttpResponseMessage response = new HttpResponseMessage();
 
+                // sending PUT request to the appropriate endpoint
                 if (model.IsRecurring)
                 {
                     response = await client.PutAsJsonAsync($"{apiUrl}/recurringExpenses", model);
@@ -208,6 +220,7 @@
 
                 HttpResponseMessage response = new HttpResponseMessage();
 
+                // first step is getting the right expense and then sending a HTTP Delete request
                 if (isRecurring)
                 {
                     response = await client.GetAsync($"{apiUrl}/recurringExpenses/{id}");

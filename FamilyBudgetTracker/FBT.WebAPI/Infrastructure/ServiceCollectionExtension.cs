@@ -34,8 +34,8 @@
             this IServiceCollection services,
             IConfiguration configuration)
             => services.AddDbContext<FamilyBudgetTrackerDbContext>(options => options
-                        .UseSqlServer(configuration
-                            .GetConnectionString("DefaultConnection")));
+                        .UseNpgsql(configuration
+                            .GetConnectionString("WebApiDatabase")));
 
         public static IServiceCollection AddIdentity(this IServiceCollection services)
         {

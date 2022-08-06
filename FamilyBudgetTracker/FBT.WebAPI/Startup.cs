@@ -6,6 +6,7 @@ namespace FBT.WebAPI
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+    using System;
 
     public class Startup
     {
@@ -37,6 +38,8 @@ namespace FBT.WebAPI
                 app.UseDeveloperExceptionPage();
                 app.UseMigrationsEndPoint();
             }
+
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
             app
                 .UseSwaggerUI()

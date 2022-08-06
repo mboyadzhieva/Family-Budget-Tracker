@@ -14,7 +14,7 @@
     public class ExpenseController : Controller
     {
         private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly string apiUrl = "https://familybudgettrackerwebapi.azurewebsites.net";
+        private readonly string apiUrl = "https://family-budget-tracker-api.herokuapp.com";
         private const string JSON_MEDIA_TYPE = "application/json";
 
         public ExpenseController(IHttpContextAccessor httpContextAccessor)

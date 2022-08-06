@@ -11,7 +11,7 @@
     public class AccountController : Controller
     {
         private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly string apiUrl = "https://familybudgettrackerwebapi.azurewebsites.net/identity";
+        private readonly string apiUrl = "https://family-budget-tracker-api.herokuapp.com/identity";
 
         public AccountController(IHttpContextAccessor httpContextAccessor)
         {

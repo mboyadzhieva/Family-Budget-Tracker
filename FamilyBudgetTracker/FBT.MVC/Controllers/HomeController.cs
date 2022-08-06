@@ -14,7 +14,7 @@
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly string apiUrl = "https://familybudgettrackerwebapi.azurewebsites.net/budget";
+        private readonly string apiUrl = "https://family-budget-tracker-api.herokuapp.com/budget";
         private const string JSON_MEDIA_TYPE = "application/json";
 
         public HomeController(ILogger<HomeController> logger, IHttpContextAccessor httpContextAccessor)

@@ -18,6 +18,7 @@ Simple web application, created for tracking family budget.
 - Every user has access only to their payments and can delete and edit only them.
 
 ## Ways to check out the application
+Login credentials: ***username: test.user & password: test***
 ### 1. Access the deployed version at [Family Budget Tracker](https://fbt-mvc.azurewebsites.net/)
 ### 2. Download the source code as a zip or clone it:
 - Prerequisites: [.NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
